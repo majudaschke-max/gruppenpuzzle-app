@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17324d">
+  <meta name="description" content="Gruppenpuzzle planen, Gruppen auslosen und mit einem Phasentimer durchführen.">
+  <title>Gruppenpuzzle – planen und durchführen</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="#top" aria-label="Gruppenpuzzle – Startseite">
+        <span class="brand-mark" aria-hidden="true">GP</span>
+        <span>Gruppenpuzzle</span>
+      </a>
+      <button class="button button-ghost button-small" id="resetSettings" type="button">Einstellungen zurücksetzen</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero shell" id="top" aria-labelledby="pageTitle">
+      <div class="hero-copy">
+        <p class="eyebrow">Methodenhelfer für den Unterricht</p>
+        <h1 id="pageTitle">Gruppenpuzzle planen und durchführen</h1>
+        <p class="hero-lead">Gruppen berechnen, per Klassenlisten-Nummer auslosen und die Klasse mit einem Phasentimer durch den Ablauf führen.</p>
+      </div>
+      <ol class="hero-steps" aria-label="Ablauf der Vorbereitung">
+        <li><span>1</span> Gruppen planen</li>
+        <li><span>2</span> Ablauf prüfen</li>
+        <li><span>3</span> Timer starten</li>
+      </ol>
+    </section>
+
+    <div class="shell app-layout">
+      <section class="card" aria-labelledby="groupHeading">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">Planung · 1</p>
+            <h2 id="groupHeading">Gruppen planen</h2>
+          </div>
+          <span class="status-badge" id="attendanceBadge">0 anwesend</span>
+        </div>
+
+        <fieldset class="mode-picker">
+          <legend>Wie möchtest du die Klasse erfassen?</legend>
+          <label class="mode-option">
+            <input type="radio" name="entryMode" value="range" checked>
+            <span><strong>Liste von 1 bis …</strong><small>Fehlende Nummern ausschließen</small></span>
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="entryMode" value="direct">
+            <span><strong>Anwesende direkt eingeben</strong><small>Praktisch bei vielen Lücken</small></span>
+          </label>
+        </fieldset>
+
+        <div class="form-grid">
+          <div class="field" data-mode-panel="range">
+            <label for="highestNumber">Höchste Nummer der Klassenliste</label>
+            <input id="highestNumber" type="number" min="1" max="99" inputmode="numeric" value="28">
+          </div>
+          <div class="field" data-mode-panel="range">
+            <label for="absentNumbers">Fehlende Nummern <span>optional</span></label>
+            <input id="absentNumbers" type="text" inputmode="numeric" placeholder="z. B. 4, 17, 22" aria-describedby="numberFormatHint">
+          </div>
+          <div class="field field-wide" data-mode-panel="direct" hidden>
+            <label for="presentNumbers">Anwesende Nummern</label>
+            <textarea id="presentNumbers" rows="3" inputmode="numeric" placeholder="z. B. 1, 2, 3, 5, 6, 8"></textarea>
+          </div>
+          <p class="field-hint field-wide" id="numberFormatHint">Trenne Nummern mit Kommas, Leerzeichen oder Semikolons.</p>
+          <div class="field">
+            <label for="topicCount">Anzahl der Expertenthemen</label>
+            <select id="topicCount">
+              <option value="3">3 Themen</option>
+              <option value="4" selected>4 Themen</option>
+              <option value="5">5 Themen</option>
+              <option value="6">6 Themen</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="availableTime">Verfügbare Gesamtzeit <span>optional</span></label>
+            <div class="input-suffix">
+              <input id="availableTime" type="number" min="1" max="300" inputmode="numeric" placeholder="z. B. 45">
+              <span>Min.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="message" id="inputMessage" role="status" aria-live="polite"></div>
+
+        <div class="recommendation" id="groupRecommendation" aria-live="polite">
+          <div class="recommendation-main">
+            <span class="recommendation-number" id="homeGroupCount">7</span>
+            <span>Stammgruppen</span>
+          </div>
+          <div class="recommendation-details" id="recommendationDetails"></div>
+        </div>
+
+        <div class="button-row">
+          <button class="button button-primary" id="drawGroups" type="button">Gruppen auslosen</button>
+          <button class="button button-secondary" id="recalculate" type="button">Empfehlung aktualisieren</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="qualityHeading">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">Planung · 2</p>
+            <h2 id="qualityHeading">Kurz prüfen</h2>
+          </div>
+          <span class="quality-score" id="qualityScore" aria-label="0 von 4 Kriterien erfüllt">0/4</span>
+        </div>
+        <p class="section-intro">Vier Punkte machen aus verteilter Arbeit ein echtes Gruppenpuzzle.</p>
+        <div class="checklist" id="qualityChecklist">
+          <label class="check-item">
+            <input type="checkbox" data-quality="balanced">
+            <span><strong>Ähnlicher Umfang</strong><small>Die Teilthemen sind ungefähr gleich anspruchsvoll.</small></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" data-quality="synthesis">
+            <span><strong>Gemeinsames Ergebnis</strong><small>Für die Abschlussaufgabe werden alle Teilthemen benötigt.</small></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" data-quality="independent">
+            <span><strong>Selbstständig erklärbar</strong><small>Alle können ihr Expertenthema selbst erklären.</small></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" data-quality="individual">
+            <span><strong>Individuelle Sicherung</strong><small>Am Ende wird das gesamte Verständnis sichtbar.</small></span>
+          </label>
+        </div>
+        <div class="quality-feedback" id="qualityFeedback" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="card card-wide lottery-card" id="lotterySection" aria-labelledby="lotteryHeading" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="step-label">Auslosung</p>
+            <h2 id="lotteryHeading">Deine Gruppeneinteilung</h2>
+          </div>
+          <span class="status-badge status-success" id="lotteryStatus">Aktuell</span>
+        </div>
+        <p class="section-intro" id="lotterySummary"></p>
+
+        <div class="view-switch" role="tablist" aria-label="Gruppenansicht">
+          <button type="button" role="tab" aria-selected="true" aria-controls="homeGroupsPanel" id="homeGroupsTab">Stammgruppen</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="expertGroupsPanel" id="expertGroupsTab">Expertengruppen</button>
+        </div>
+        <div id="homeGroupsPanel" role="tabpanel" aria-labelledby="homeGroupsTab"></div>
+        <div id="expertGroupsPanel" role="tabpanel" aria-labelledby="expertGroupsTab" hidden></div>
+
+        <div class="lottery-notes" id="lotteryNotes"></div>
+        <div class="button-row">
+          <button class="button button-primary" id="redrawGroups" type="button">Neu auslosen</button>
+          <button class="button button-secondary" id="copyGroups" type="button">Auslosung kopieren</button>
+          <button class="button button-ghost" id="printGroups" type="button">Drucken</button>
+        </div>
+        <p class="inline-feedback" id="copyGroupsFeedback" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="card card-wide" aria-labelledby="phasesHeading">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">Planung · 3</p>
+            <h2 id="phasesHeading">Phasen und Zeiten</h2>
+          </div>
+          <div class="total-time" aria-live="polite"><strong id="totalMinutes">43</strong><span>Minuten</span></div>
+        </div>
+        <p class="section-intro">Passe die Zeiten an. Hinweise bleiben im Unterricht zunächst eingeklappt.</p>
+        <div class="phase-list" id="phaseList"></div>
+
+        <div class="time-balance" id="timeBalance" aria-live="polite"></div>
+        <div class="start-panel">
+          <div>
+            <strong>Bereit für die Durchführung?</strong>
+            <span>Der Timer öffnet eine ruhige, gut projizierbare Ansicht.</span>
+          </div>
+          <button class="button button-primary button-large" id="startSequence" type="button">Gruppenpuzzle starten</button>
+        </div>
+      </section>
+
+      <section class="card card-wide method-card" aria-labelledby="methodHeading">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">Vorlage</p>
+            <h2 id="methodHeading">Methodenanleitung</h2>
+          </div>
+          <button class="button button-secondary button-small" id="copyMethod" type="button">Anleitung kopieren</button>
+        </div>
+        <div class="method-layout">
+          <ol id="methodText">
+            <li>Die Klasse wird in Stammgruppen eingeteilt.</li>
+            <li>Jede Person übernimmt ein Teilthema.</li>
+            <li>Zunächst beschäftigt sich jede Person allein mit ihrem Material.</li>
+            <li>Danach treffen sich alle Personen mit demselben Teilthema in einer Expertengruppe.</li>
+            <li>Die Expertinnen und Experten klären ihre Inhalte und bereiten eine verständliche Erklärung vor.</li>
+            <li>Alle kehren in ihre Stammgruppen zurück und erklären ihre Teilthemen.</li>
+            <li>Die Stammgruppe löst eine Aufgabe, für die alle Ergebnisse benötigt werden.</li>
+            <li>Eine individuelle Sicherung prüft, ob alle das gesamte Thema verstanden haben.</li>
+          </ol>
+          <aside class="method-tip">
+            <strong>Entscheidend</strong>
+            <p>Das Puzzle entsteht erst bei der gemeinsamen Aufgabe: Die Gruppe muss die einzelnen Informationen wirklich zusammenführen.</p>
+          </aside>
+        </div>
+        <p class="inline-feedback" id="copyMethodFeedback" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p><strong>Datenschutz:</strong> Alle Eingaben, Klassenlisten-Nummern und Gruppeneinteilungen bleiben ausschließlich auf diesem Gerät. Es werden keine Daten übertragen.</p>
+      <p>Funktioniert ohne Anmeldung und ohne Server.</p>
+    </div>
+  </footer>
+
+  <section class="timer-view" id="timerView" hidden aria-labelledby="timerPhaseName">
+    <header class="timer-header">
+      <div>
+        <span class="timer-brand">Gruppenpuzzle</span>
+        <span class="timer-phase-count" id="timerPhaseCount">Phase 1 von 6</span>
+      </div>
+      <div class="timer-header-actions">
+        <button class="timer-icon-button" id="showGroups" type="button" hidden>Gruppen anzeigen</button>
+        <button class="timer-icon-button" id="toggleFullscreen" type="button">Vollbild</button>
+        <button class="timer-icon-button timer-end" id="endSequence" type="button">Ablauf beenden</button>
+      </div>
+    </header>
+
+    <div class="timer-progress" aria-hidden="true"><span id="timerProgressBar"></span></div>
+
+    <main class="timer-main">
+      <div class="timer-status" id="timerStatus">Bereit</div>
+      <h2 id="timerPhaseName">Stammgruppen bilden</h2>
+      <time class="timer-clock" id="timerClock" datetime="PT3M">03:00</time>
+      <p class="timer-task" id="timerTask"></p>
+      <p class="timer-next" id="timerNext"></p>
+
+      <details class="timer-help" id="timerHelp">
+        <summary>Hinweis für die Lehrkraft</summary>
+        <p id="timerAdvice"></p>
+        <ul id="timerQuestions"></ul>
+      </details>
+
+      <div class="timer-controls" aria-label="Timer steuern">
+        <button class="control-button control-secondary" id="previousPhase" type="button">Zurück</button>
+        <button class="control-button control-adjust" id="subtractMinute" type="button">− 1 Min.</button>
+        <button class="control-button control-primary" id="toggleTimer" type="button">Start</button>
+        <button class="control-button control-adjust" id="addMinute" type="button">+ 1 Min.</button>
+        <button class="control-button control-secondary" id="nextPhase" type="button">Weiter</button>
+      </div>
+      <div class="timer-secondary-controls">
+        <button class="text-button" id="restartPhase" type="button">Phase neu starten</button>
+        <label class="switch-label">
+          <input type="checkbox" id="autoAdvance">
+          <span>Automatisch zur nächsten Phase wechseln</span>
+        </label>
+      </div>
+    </main>
+
+    <dialog class="groups-dialog" id="groupsDialog" aria-labelledby="groupsDialogTitle">
+      <div class="dialog-header">
+        <h2 id="groupsDialogTitle">Gruppeneinteilung</h2>
+        <button class="dialog-close" id="closeGroups" type="button" aria-label="Gruppeneinteilung schließen">×</button>
+      </div>
+      <div class="view-switch" role="tablist" aria-label="Gruppenansicht im Timer">
+        <button type="button" role="tab" aria-selected="true" data-timer-group-view="home">Stammgruppen</button>
+        <button type="button" role="tab" aria-selected="false" data-timer-group-view="expert">Expertengruppen</button>
+      </div>
+      <div id="timerGroupsContent"></div>
+    </dialog>
+  </section>
+
+  <template id="phaseTemplate">
+    <article class="phase-item">
+      <div class="phase-number" aria-hidden="true"></div>
+      <div class="phase-content">
+        <div class="phase-title-row">
+          <h3></h3>
+          <div class="minute-stepper">
+            <button type="button" data-action="decrease" aria-label="Eine Minute abziehen">−</button>
+            <output></output>
+            <button type="button" data-action="increase" aria-label="Eine Minute hinzufügen">+</button>
+          </div>
+        </div>
+        <p class="phase-task"></p>
+        <details>
+          <summary>Hinweis für die Lehrkraft</summary>
+          <p class="phase-advice"></p>
+          <ul class="phase-questions"></ul>
+        </details>
+      </div>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
